@@ -149,6 +149,8 @@ export type SiteConfig = {
 
 	// 文章内容页配置
 	post: {
+		// 文章路径标识生成方式
+		slug: "pinyin" | "random";
 		// 提醒框（Admonitions）配置
 		rehypeCallouts: {
 			theme: "github" | "obsidian" | "vitepress" | "docusaurus";
@@ -236,3 +238,5 @@ export type SiteConfig = {
 		noReferrerDomains?: string[];
 	};
 };
+
+export type PostSlugMode = SiteConfig["post"]["slug"];

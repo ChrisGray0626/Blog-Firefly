@@ -26,6 +26,7 @@ import remarkAdmonitionToBlockquoteCallout from "remark-admonition-to-blockquote
 import remarkDirective from "remark-directive"; /* Handle directives */
 import remarkMath from "remark-math";
 import remarkSectionize from "remark-sectionize";
+import { postSlugIntegration } from "./scripts/post-slug";
 import {
 	commentConfig,
 	dynamicConfig,
@@ -117,6 +118,7 @@ export default defineConfig({
 	},
 
 	integrations: [
+		postSlugIntegration(siteConfig.post.slug),
 		swup({
 			theme: false,
 			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
@@ -242,7 +244,7 @@ export default defineConfig({
 				if (pathname === "/dynamic/" && !siteConfig.pages.dynamic) {
 					return false;
 				}
-				if (pathname === "/gallery/" && !siteConfig.pages.gallery) {
+				if (!siteConfig.pages.gallery && pathname.startsWith("/gallery/")) {
 					return false;
 				}
 				if (pathname === "/friends/" && !siteConfig.pages.friends) {

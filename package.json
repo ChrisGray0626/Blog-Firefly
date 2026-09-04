@@ -1,5 +1,5 @@
 {
-  "name": "firefly",
+  "name": "blog-firefly",
   "type": "module",
   "version": "6.16.6",
   "engines": {
@@ -16,7 +16,11 @@
     "type-check": "tsc --noEmit --isolatedDeclarations",
     "new-dynamic": "tsx scripts/new-dynamic.js",
     "new-d": "tsx scripts/new-dynamic.js",
-    "new-post": "node scripts/new-post.js",
+    "new-post": "tsx scripts/new-post.ts",
+    "new-p": "pnpm new-post",
+    "sync-post": "tsx scripts/sync-post.ts",
+    "deploy": "git add . && git commit -m \"feat(post): add new article\" && git push",
+    "d": "pnpm run deploy",
     "format": "biome format --write ./src ./scripts",
     "lint": "biome check --write ./src ./scripts",
     "preinstall": "npx only-allow pnpm",

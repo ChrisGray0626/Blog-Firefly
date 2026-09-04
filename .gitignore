@@ -18,18 +18,15 @@ pnpm-debug.log*
 
 # environment variables
 .env
-.env.production
 
 # macOS-specific files
 .DS_Store
-
-.vercel
 
 package-lock.json
 bun.lockb
 yarn.lock
 
-# ide
+# IDE
 .idea
 *.iml
 
@@ -47,3 +44,6 @@ package/
 .codex*
 .claude
 .mimocode
+
+# pnpm local store
+.pnpm-store/

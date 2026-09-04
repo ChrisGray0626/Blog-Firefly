@@ -98,9 +98,9 @@ const {
 <!-- Main content -->
 <div class="content-panel absolute w-full z-30 pointer-events-none">
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
-    <div class="relative w-full xl:w-[92vw] max-w-(--page-width) mx-auto pointer-events-auto">
+    <div class="relative min-h-[inherit] w-full xl:w-[92vw] max-w-(--page-width) mx-auto pointer-events-auto">
         <div id="main-grid"
-          class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-2 md:px-4 ${!mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
+          class={`transition duration-700 min-h-[inherit] w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] md:grid-rows-[1fr_auto] mx-auto gap-4 px-2 md:px-4 ${!mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
           data-sidebar-enable={sidebarLayoutConfig.enable ? "true" : "false"}
           data-grid-hide-sidebar-on-post={hideSidebarOnPostPage ? "true" : "false"}
           data-sidebar-position={sidebarLayoutConfig.position}
@@ -161,7 +161,7 @@ const {
                 </div>
             )}
 
-            <div class={footerClassName}>
+            <div class={`${footerClassName} row-start-3 md:row-start-2`}>
                 <Footer></Footer>
             </div>
         </div>
