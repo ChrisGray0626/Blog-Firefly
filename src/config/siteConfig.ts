@@ -241,7 +241,7 @@ export const siteConfig: SiteConfig = {
 			// 沉浸阅读中是否显示目录栏
 			tocEnabled: true,
 			// 目录栏位置："left" | "right"
-			tocPosition: "left",
+			tocPosition: "right",
 		},
 	},
 
