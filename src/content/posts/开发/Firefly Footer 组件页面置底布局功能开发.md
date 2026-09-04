@@ -1,11 +1,13 @@
 ---
-title: Firefly Footer 组件页面置底布局功能开发
-published: '2026-08-29'
-description: >-
-  短页面的 Footer 会紧跟正文而无法贴近视口底部；通过逐层继承最小高度、调整响应式 Grid 行结构并恢复移动端 Grid 布局，使 Footer
-  在短页面置底、长页面随内容延伸。
+image: ''
+lang: ''
+published: 2026-08-29
+description: 短页面的 Footer 会紧跟正文而无法贴近视口底部；通过逐层继承最小高度、调整响应式 Grid 行结构并恢复移动端 Grid 布局，使 Footer 在短页面置底、长页面随内容延伸。
 category: 开发
 slug: 37c1d86c687d3b5f
+series: Firefly 改造计划
+updated: 2026-09-04
+title: Firefly Footer 组件页面置底布局功能开发
 tags:
   - 开发
   - Firefly

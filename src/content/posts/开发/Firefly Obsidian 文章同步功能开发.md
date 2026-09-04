@@ -1,9 +1,13 @@
 ---
-title: Firefly Obsidian 文章同步功能开发
-published: '2026-09-02'
+image: ''
+lang: ''
+published: 2026-09-02
 description: 以 Obsidian 知识库作为文章唯一内容源，将指定文档单向同步到 Firefly 的文章目录。
 category: 开发
 slug: 8f0fc83d5f501213
+series: Firefly 改造计划
+updated: 2026-09-04
+title: Firefly Obsidian 文章同步功能开发
 tags:
   - 开发
   - Firefly

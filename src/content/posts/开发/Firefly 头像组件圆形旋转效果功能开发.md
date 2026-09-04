@@ -1,9 +1,13 @@
 ---
-title: Firefly 头像组件圆形旋转效果功能开发
-published: '2026-08-28'
+image: ''
+lang: ''
+published: 2026-08-28
 description: 侧边栏头像原为静态方形，缺少悬停反馈；通过正方形约束和圆形裁切统一外观，并为内部图片添加悬停旋转与移出归位动画。
 category: 开发
 slug: 339b7202f83f6b9b
+series: Firefly 改造计划
+updated: 2026-09-04
+title: Firefly 头像组件圆形旋转效果功能开发
 tags:
   - 开发
   - Firefly

@@ -1,11 +1,13 @@
 ---
-title: Firefly 文章 slug 自动生成功能开发
-published: '2026-08-30'
-description: >-
-  文章 slug 依赖标题拼音，标题变化后链接容易失配；新增随机 slug 模式，在开发阶段补全缺失值，并在新建文章时按分类与标题创建文件、生成并校验唯一
-  slug。
+image: ""
+lang: ""
+published: 2026-08-30
+description: 文章 slug 依赖标题拼音，标题变化后链接容易失配；新增随机 slug 模式，在开发阶段补全缺失值，并在新建文章时按分类与标题创建文件、生成并校验唯一 slug。
 category: 开发
 slug: 069ba0f6eb66dbf0
+series: Firefly 改造计划
+updated: 2026-09-04
+title: Firefly 文章 slug 自动生成功能开发
 tags:
   - 开发
   - Firefly
