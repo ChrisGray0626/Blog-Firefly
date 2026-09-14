@@ -39,5 +39,11 @@ export const profileConfig: ProfileConfig = {
 			url: "mailto:yuxiaohui0626@gmail.com",
 			showName: false,
 		},
+		{
+			name: "Atom",
+			icon: "fa7-solid:atom",
+			url: "/atom/",
+			showName: false,
+		},
 	],
 };
