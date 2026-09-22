@@ -1,24 +1,22 @@
 ---
-image: ''
-lang: ''
-published: 2026-09-02
+title: Firefly Obsidian 文章同步功能开发
+published: '2026-09-02'
 description: 以 Obsidian 知识库作为文章唯一内容源，将指定文档单向同步到 Firefly 的文章目录。
 category: 开发
-slug: 8f0fc83d5f501213
 series: Firefly 改造计划
-updated: 2026-09-04
-title: Firefly Obsidian 文章同步功能开发
+slug: 8f0fc83d5f501213
 tags:
   - 开发
   - Firefly
   - Obsidian
   - Astro
   - TypeScript
+updated: '2026-09-22'
 ---
 
 # 需求分析
 
-博客文章首先在 Obsidian 中撰写，过去，一篇文章准备发布时，需要先复制到 Firefly 的 `src/content/posts` 目录，再把 frontmatter 改写成博客所需的。该流程容易漏掉正文或元数据，或是内容出现更新时需要手动在两侧更新。
+博客文章首先在 Obsidian 中撰写，过去一篇文章准备发布时，需要先复制到 Firefly 的 `src/content/posts` 目录，再把 frontmatter 改写成博客所需的。该流程容易漏掉正文或元数据，或是内容出现更新时需要手动在两侧更新。
 
 # 解决方案
 
@@ -34,7 +32,7 @@ Obsidian 中撰写并标记文章
 src/content/posts/<category>/<title>.md
 ```
 
-Obsidian 保存可继续编辑的原文，博客目录只保存生成的发布副本。所有待同步文章会先完成字段、slug 和路径校验；检查通过后，缺失的文章被创建，已经存在的文章在原位置更新。
+Obsidian 保存可继续编辑的原文，博客目录只保存生成的发布副本。所有待同步文章会先完成字段、slug 和路径校验；检查通过后，缺失的文章被创建，已经存在的文章只有在同步字段或正文发生变化时才会更新。
 
 标记文章和同步博客属于两个不同阶段。
 
@@ -66,6 +64,7 @@ blog_description: 以 Obsidian 作为唯一内容源，将指定文档同步到 
 blog_category: 开发
 blog_published: 2026-09-02
 blog_slug: 8f0fc83d5f501213
+blog_series: Firefly 改造计划
 tags:
   - Firefly
   - Obsidian
@@ -90,6 +89,7 @@ module.exports = async ({ app }) => {
 		blog_category: "",
 		blog_published: createBlogPublished,
 		blog_slug: createBlogSlug,
+		blog_series: "",
 	};
 
 	for (const [key, value] of Object.entries(defaults)) {
@@ -119,17 +119,18 @@ function createBlogSlug() {
 
 ## 同步博客文章
 
-`scripts/sync-post.ts` 的入口只组织四个阶段：读取源（Obsidian 端）文章、读取现有博客文章、检查两端冲突、写入目标文件。
+`scripts/sync-post.ts` 的入口只组织四个阶段：完整读取源（Obsidian 端）文章、完整读取目标（Firefly 端）文章、检查两端冲突、按变化写入目标文件。
 
 ```ts
 async function main(): Promise<void> {
   const vaultRootPath = readVaultRootPath();
   await fs.access(vaultRootPath);
 
+  console.log("Reading source and target posts...");
   const sourcePosts = await readSourcePosts(vaultRootPath);
-  const existingPostPathsBySlug = await readPostPathsBySlug();
-  assertNoPostSyncConflicts(sourcePosts, existingPostPathsBySlug);
-  await writePosts(sourcePosts);
+  const targetPostsBySlug = await readTargetPosts();
+  assertNoPostSyncConflicts(sourcePosts, targetPostsBySlug);
+  await syncPosts(sourcePosts, targetPostsBySlug);
 }
 ```
 
@@ -153,10 +154,12 @@ title: Firefly Obsidian 文章同步功能开发
 published: '2026-09-02'
 description: 以 Obsidian 作为唯一内容源，将指定文档同步到 Firefly。
 category: 开发
+series: Firefly 改造计划
 slug: 8f0fc83d5f501213
 tags:
   - Firefly
   - Obsidian
+updated: '2026-09-02'
 ---
 ```
 
@@ -173,7 +176,9 @@ const filePaths = await glob("**/*.md", {
 });
 ```
 
-读取目标文档的 frontmatter 和正文，只保留 `blog` 等于 `true` 的文档：
+源端完整扫描后会分批读取文件，每批最多并行读取 32 个，避免大量云盘文件串行读取时长时间没有响应，也避免一次性并发读取给云盘造成过大压力。读取失败时直接报告具体文件路径。
+
+读取源文档的 frontmatter 和正文，只保留 `blog` 等于 `true` 的文档：
 
 ```ts
 const matterFile = matter(source);
@@ -188,12 +193,15 @@ if (matterFile.data.blog !== true) {
 
 | Obsidian 字段        | Firefly 字段    | 约束              |
 | ------------------ | ------------- | --------------- |
-| `blog_title`       | `title`       | 非空且可安全用作文件名     |
-| `blog_description` | `description` | 非空字符串           |
-| `blog_category`    | `category`    | 非空且可安全用作目录名     |
+| `blog_title`       | `title`       | 非空字符串           |
+| `blog_description` | `description` | 可缺失或为空          |
+| `blog_category`    | `category`    | 非空字符串           |
 | `blog_published`   | `published`   | `YYYY-MM-DD`    |
 | `blog_slug`        | `slug`        | 非空并复用博客 slug 规则 |
+| `blog_series`      | `series`      | 可缺失或为空          |
 | `tags`             | `tags`        | 字符串数组，默认为空数组    |
+
+源端和目标端的字段名不同，但转换后使用同一个 `syncFrontmatterSchema`。`sourceFrontmatterSchema` 只负责校验 `blog_*` 字段并完成名称映射，后续比较和写入统一使用转换后的结构。
 
 ## 用 Slug 确认身份，用路径确认位置
 
@@ -201,13 +209,27 @@ if (matterFile.data.blog !== true) {
 
 理论上只有相同文章才会写入同一博客端路径，但原则上不同文章也可以配置出相同的路径（仅与 `title` 与 `category` 相关），这可能导致原有文章被覆盖的情况。因此同步前仅检查 `slug` 还不够，还需要建立反向的路径 -> slug 索引，并按以下规则处理：
 
-| 源文章与博客文章的关系 | 结果 |
-| --- | --- |
-| slug 不存在，目标路径未占用 | 新建文章 |
-| slug 相同，目标路径相同 | 原地更新 |
-| slug 相同，目标路径不同 | 报错，避免保留两个副本 |
-| slug 不同，目标路径相同 | 报错，避免覆盖另一篇文章 |
+| 源文章与博客文章的关系      | 结果           |
+| ---------------- | ------------ |
+| slug 不存在，目标路径未占用 | 新建文章         |
+| slug 相同，目标路径相同   | 原地更新         |
+| slug 相同，目标路径不同   | 报错，避免保留两个副本  |
+| slug 不同，目标路径相同   | 报错，避免覆盖另一篇文章 |
 
 ## 写入目标文章
 
-同一路径不存在时， 创建新文章；同一路径已经存在时，直接使用源文档的正文和转换后的 frontmatter 覆盖。博客副本中额外添加但源端没有对应字段的 frontmatter 不会保留。
+同步以 slug 关联两端文章，并比较转换后的 frontmatter 和 Markdown 正文。比较时不包含目标文章已有的 `updated` 字段：
+
+| 情况 | 写入行为 | `updated` |
+| --- | --- | --- |
+| 目标文章不存在 | 创建新文章 | 与 `published` 相同 |
+| 目标文章存在，内容没有变化 | 不写入文件 | 保留原值 |
+| 目标文章存在，frontmatter 或正文发生变化 | 使用源文档覆盖 | 更新为同步当天日期 |
+
+因此重复运行同步命令不会主动覆盖未变化的文章，也不会无故刷新文件修改时间和 `updated`。发生变化时，博客副本中额外添加但源端没有对应字段的 frontmatter 仍不会保留。
+
+同步完成后输出本次创建、更新和未变化的文章数量：
+
+```text
+Created: 1, updated: 2, unchanged: 3.
+```

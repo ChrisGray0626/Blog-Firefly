@@ -64,7 +64,7 @@ const postsCollection: ContentCollection<PostData> = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		published: z.coerce.date(),
-		updated: z.date().optional(),
+		updated: z.coerce.date().optional(),
 		draft: z.boolean().optional().default(false),
 		description: z.string().optional().default(""),
 		image: z.string().optional().default(""),

@@ -14,11 +14,11 @@ export type BuiltPostSlug = {
 	slug: string;
 };
 
-export const postSlugSchema = z.string().trim().min(1);
+export const textSchema: z.ZodString = z.string().trim().min(1);
 
 const postFrontmatterSchema = z.object({
-	title: z.string().trim().min(1),
-	slug: postSlugSchema.nullish().transform((slug) => slug || null),
+	title: textSchema,
+	slug: textSchema.nullish().transform((slug) => slug || null),
 });
 
 type PostRecord = BasePostRecord & {
