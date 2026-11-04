@@ -24,6 +24,7 @@ const syncFrontmatterSchema = z.object({
 	category: textSchema,
 	series: optionalTextSchema,
 	slug: textSchema,
+	image: optionalTextSchema,
 	tags: tagsSchema.default([]),
 });
 
@@ -35,6 +36,7 @@ const sourceFrontmatterSchema = z
 		blog_series: optionalTextSchema,
 		blog_published: publishedSchema,
 		blog_slug: textSchema,
+		blog_image: optionalTextSchema,
 		tags: tagsSchema.default([]),
 	})
 	.transform((data) =>
@@ -45,6 +47,7 @@ const sourceFrontmatterSchema = z
 			category: data.blog_category,
 			series: data.blog_series,
 			slug: data.blog_slug,
+			image: data.blog_image,
 			tags: data.tags,
 		}),
 	);

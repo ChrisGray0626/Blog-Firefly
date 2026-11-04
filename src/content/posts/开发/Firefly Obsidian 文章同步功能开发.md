@@ -48,7 +48,7 @@ Obsidian 端只负责准备发布元数据。这样可以在写作时决定文�
 
 在博客项目根目录配置 `.env` ，指定 Obsidian 知识库的绝对路径：
 
-```env
+```
 OBSIDIAN_VAULT_ROOT=/absolute/path/to/Obsidian
 ```
 
